@@ -7,10 +7,6 @@ if (location.protocol == 'http:' && location.hostname != 'localhost') {
     location = `https://${location.host}`;
     throw "bye";
 }
-if (location.hash == '#enabled' || location.hash == '#disabled') {
-    // hide the description early and go straigh to the test
-    document.body.className = 'testing';
-}
     Promise.all([
         new Promise(r => document.addEventListener('DOMContentLoaded', r)),
         navigator.serviceWorker.register('/sw.js')
@@ -66,7 +62,7 @@ if (location.hash == '#enabled' || location.hash == '#disabled') {
             let imagesHTML = '';
             const cachebust = Date.now() % 10000;
             for(const n of numbers) {
-                const baseurl = `https://jpeg.speedcf.com/worker?image=cat/${n}.jpg&cachebust=${cachebust}${withPrioritization ? '' : 'nopri=1'}`;
+                const baseurl = `https://jpeg.speedcf.com/worker?image=cat/${n}.jpg&cachebust=${cachebust}${withPrioritization ? '' : '&nopri=1'}`;
                 imagesHTML += `<li><img src="${baseurl}&size=300" width="300" height="300" srcset="${baseurl}&size=300 300w, ${baseurl}&size=600 600w" alt="cat"></li>`;
             }
 
@@ -75,7 +71,7 @@ if (location.hash == '#enabled' || location.hash == '#disabled') {
             // fetched before JS/CSS loads, speeding up layout,
             // even for pages weighed down by JS.
             let ballast = document.createElement('script');
-            ballast.src = `/ballast.js?${cachebust}';
+            ballast.src = `/ballast.js?${cachebust}`;
             document.head.appendChild(ballast);
 
             imglist.innerHTML = imagesHTML;
@@ -188,6 +184,9 @@ body.testing {
     background: #555;
     color: #fff;
 }
+body.testing #intro {
+    display: none;
+}
 #image-list {
     border: 2px solid black;
     box-sizing: border-box;
@@ -229,7 +228,7 @@ body.testing {
     box-sizing: border-box;
     object-fit: cover;
     width: 100%;
-    max-height: 100%;
+    height: auto;
     display: block;
 }
 #graph svg {
@@ -342,6 +341,13 @@ body.testing {
     border-color: #000;
 }
 </style>
+<body>
+<script>
+if (location.hash == '#enabled' || location.hash == '#disabled') {
+    // hide the description early and go straigh to the test
+    document.body.className = 'testing';
+}
+</script>
 <div id=intro>
 <h1><img width="761" height="310" src="logo.png" alt="HTTP/2 Parallel Progressive Streaming"></h1>
 This is a demo page of Cloudflare's HTTP/2 prioritization feature applied to progressive JPEG images. It&nbsp;makes all images on the page appear to load quicker by&nbsp;prioritizing their progressive "previews" on&nbsp;the network level. <a href="https://blog.cloudflare.com/parallel-streaming-of-progressive-images/">See the blog post for&nbsp;details</a>.
