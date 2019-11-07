@@ -7,6 +7,10 @@ if (location.protocol == 'http:' && location.hostname != 'localhost') {
     location = `https://${location.host}`;
     throw "bye";
 }
+if (location.hash == '#enabled' || location.hash == '#disabled') {
+    // hide the description early and go straigh to the test
+    document.body.className = 'testing';
+}
     Promise.all([
         new Promise(r => document.addEventListener('DOMContentLoaded', r)),
         navigator.serviceWorker.register('/sw.js')
@@ -20,7 +24,6 @@ if (location.protocol == 'http:' && location.hostname != 'localhost') {
             }
         }
         onhashchange = checkhash;
-        setTimeout(checkhash, 1);
 
         const imglist = document.getElementById('image-list');
         const backButton = document.getElementById('back');
@@ -159,6 +162,7 @@ if (location.protocol == 'http:' && location.hostname != 'localhost') {
             svglink.download = 'cloudflare-progressive.svg';
             svglink.href = `data:image/svg,${encodeURIComponent(svglink.innerHTML)}`;
         }
+        checkhash()
     })
 </script>
 <style>
