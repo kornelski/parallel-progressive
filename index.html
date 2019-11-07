@@ -67,8 +67,17 @@ if (location.hash == '#enabled' || location.hash == '#disabled') {
             const cachebust = Date.now() % 10000;
             for(const n of numbers) {
                 const baseurl = `https://jpeg.speedcf.com/worker?image=cat/${n}.jpg&cachebust=${cachebust}${withPrioritization ? '' : 'nopri=1'}`;
-                imagesHTML += `<img src="${baseurl}&size=300" width="300" height="300" srcset="${baseurl}&size=300 300w, ${baseurl}&size=600 600w" alt="cat">`;
+                imagesHTML += `<li><img src="${baseurl}&size=300" width="300" height="300" srcset="${baseurl}&size=300 300w, ${baseurl}&size=600 600w" alt="cat"></li>`;
             }
+
+            // We can also prioritize images vs scripts,
+            // and this should demonstrate that image sizes can be
+            // fetched before JS/CSS loads, speeding up layout,
+            // even for pages weighed down by JS.
+            let ballast = document.createElement('script');
+            ballast.src = `/ballast.js?${cachebust}';
+            document.head.appendChild(ballast);
+
             imglist.innerHTML = imagesHTML;
             imglist.removeAttribute('hidden');
         }
