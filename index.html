@@ -2,52 +2,72 @@
 <meta charset=UTF-8>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>H/2 Progressive test page</title>
-<script>function start() {/*it'll be replaced by the next script, if it works*/alert("this browser is not supported")}</script>
 <script>
-    (function(){
-        if (location.protocol == 'http:') {
-            location = `https://${location.host}`;
-            return;
+if (location.protocol == 'http:' && location.hostname != 'localhost') {
+    location = `https://${location.host}`;
+    throw "bye";
+}
+    Promise.all([
+        new Promise(r => document.addEventListener('DOMContentLoaded', r)),
+        navigator.serviceWorker.register('/sw.js')
+    ])
+    .then(() => {
+        function checkhash() {
+            switch(location.hash) {
+                case "#enabled": start(true); break;
+                case "#disabled": start(false); break;
+                default: stop(); break;
+            }
         }
-        const registered = navigator.serviceWorker.register('/sw.js');
-        let requests = new Map();
-        window.start = function(withPrioritization) {
-            registered.then(() => {
-                if (isProgressiveJPEGBorked()) {
-                    alert("Sorry, Safari does not render JPEG images progressively, and therefore it won't benefit from faster progressive streaming :(");
-                }
-                requests = new Map(); // reset
-                document.body.className = 'testing';
-                document.getElementById('intro').setAttribute('hidden', 'hidden');
-                document.getElementById('back').removeAttribute('hidden');
-                const imglist = document.getElementById('image-list');
-                const backButton = document.getElementById('back');
-                const reset = function() {
-                    document.body.className = '';
-                    document.getElementById('intro').removeAttribute('hidden');
-                    imglist.setAttribute('hidden', 'hidden');
-                    backButton.setAttribute('hidden', 'hidden');
-                    document.getElementById('graph').setAttribute('hidden', 'hidden');
-                };
-                imglist.onclick = reset;
-                backButton.onclick = reset;
+        onhashchange = checkhash;
+        setTimeout(checkhash, 1);
 
-                const numbers = [];
-                for (let n = 1; n <= 23; n++) numbers.push(n);
-                for (let i = 22; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
-                }
-                numbers.push(24);
-                let imagesHTML = '';
-                const cachebust = Date.now() % 10000;
-                for(const n of numbers) {
-                    const baseurl = `https://jpeg.speedcf.com/worker?image=cat/${n}.jpg&cachebust=${cachebust}${withPrioritization ? '' : 'nopri=1'}`;
-                    imagesHTML += `<img src="${baseurl}&size=300" width="300" height="300" srcset="${baseurl}&size=300 300w, ${baseurl}&size=600 600w" alt="cat">`;
-                }
-                imglist.innerHTML = imagesHTML;
-                imglist.removeAttribute('hidden');
-            })
+        const imglist = document.getElementById('image-list');
+        const backButton = document.getElementById('back');
+        const intro = document.getElementById('intro');
+        const graphElement = document.getElementById('graph');
+        const startedLineElement = document.getElementById('startedLine');
+        const visuallyCompleteLineElement = document.getElementById('visuallyCompleteLine');
+        const goodEnoughLineElement = document.getElementById('goodEnoughLine');
+        const doneLineElement = document.getElementById('doneLine');
+        const svglink = document.getElementById('svglink');
+
+        function stop() {
+            document.body.className = '';
+            intro.removeAttribute('hidden');
+            imglist.setAttribute('hidden', 'hidden');
+            backButton.setAttribute('hidden', 'hidden');
+            graphElement.setAttribute('hidden', 'hidden');
+        }
+        imglist.onclick = stop;
+        backButton.onclick = stop;
+
+        let requests = new Map();
+        function start(withPrioritization) {
+            if (isProgressiveJPEGBorked()) {
+                alert("Sorry, Safari does not render JPEG images progressively, and therefore it won't benefit from faster progressive streaming :(");
+            }
+            requests = new Map(); // reset
+            document.body.className = 'testing';
+            intro.setAttribute('hidden', 'hidden');
+            backButton.removeAttribute('hidden');
+
+            const numbers = [];
+            for (let n = 2; n <= 23; n++) numbers.push(n);
+            for (let i = numbers.length-1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
+            }
+            numbers.unshift(1);
+            numbers.push(24);
+            let imagesHTML = '';
+            const cachebust = Date.now() % 10000;
+            for(const n of numbers) {
+                const baseurl = `https://jpeg.speedcf.com/worker?image=cat/${n}.jpg&cachebust=${cachebust}${withPrioritization ? '' : 'nopri=1'}`;
+                imagesHTML += `<img src="${baseurl}&size=300" width="300" height="300" srcset="${baseurl}&size=300 300w, ${baseurl}&size=600 600w" alt="cat">`;
+            }
+            imglist.innerHTML = imagesHTML;
+            imglist.removeAttribute('hidden');
         }
         function isProgressiveJPEGBorked() {
             // unfortunately, progressive rendering can't be feature-detected (it's not about format support, but on-screen appearance)
@@ -131,16 +151,15 @@
             visuallyCompleteLine += ` ${width},${height}`;
             goodEnoughLine += ` ${width},${height}`;
             doneLine += ` ${width},${height}`;
-            document.getElementById('startedLine').setAttribute('points', startedLine);
-            document.getElementById('visuallyCompleteLine').setAttribute('points', visuallyCompleteLine);
-            document.getElementById('goodEnoughLine').setAttribute('points', goodEnoughLine);
-            document.getElementById('doneLine').setAttribute('points', doneLine);
-            document.getElementById('graph').removeAttribute('hidden');
-            const svglink = document.getElementById('svglink');
+            startedLineElement.setAttribute('points', startedLine);
+            visuallyCompleteLineElement.setAttribute('points', visuallyCompleteLine);
+            goodEnoughLineElement.setAttribute('points', goodEnoughLine);
+            doneLineElement.setAttribute('points', doneLine);
+            graphElement.removeAttribute('hidden');
             svglink.download = 'cloudflare-progressive.svg';
             svglink.href = `data:image/svg,${encodeURIComponent(svglink.innerHTML)}`;
         }
-    })();
+    })
 </script>
 <style>
 body {
@@ -282,8 +301,8 @@ body.testing {
     display: block;
     color: #727bb3;
 }
-button {
-    display: block;
+.orange, .gray {
+    display: table;
     margin: 1em auto;
     font-size: 1.25em;
     border: none;
@@ -291,20 +310,21 @@ button {
     padding: 0.5em 1em;
     cursor: pointer;
     text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+    text-decoration: none;
 }
-button.orange {
+.orange {
     background: #FAAD3F;
     border: 1px solid #c87;
     color: #000;
     box-shadow: inset -2px -4px 7px rgba(180,50,0,0.15);
 }
-button.gray {
+.gray {
     background: #bbb;
     border: 1px solid #888;
     color: #000;
     box-shadow: inset -3px -5px 10px rgba(0,0,0,0.1);
 }
-button:hover {
+.orange:hover, .gray:hover {
     box-shadow: none;
     border-color: #000;
 }
@@ -315,16 +335,16 @@ This is a demo page of Cloudflare's HTTP/2 prioritization feature applied to pro
 
 <noscript><p>JavaScript is required for this demo (but it's not required for the HTTP/2 prioritization).</p></noscript>
 
-<p><button class="orange" onclick="start(true)" type="button">Start with prioritization</button></p>
-<p><button class="gray" onclick="start(false)" type="button">Start without prioritization</button></p>
+<p><a class="orange" href="#enabled">Start with prioritization</a></p>
+<p><a class="gray" href="#disabled">Start without prioritization</a></p>
 
 <p>The demo will show a graph of page's overall visual progress over time. Graph with a large amount of color (orange and green) shows good utilization of progressive rendering. A linear mostly black-and-white graph means sequential loading. The data is based on loading progress measured by a ServiceWorker running in the browser. Actual on-screen rendering may be different due to refresh throttling and quality of JPEG decoding implementation.</p>
 </div>
 
 
-<div hidden id="back" role=button>
+<a hidden id="back" href="#">
     ‹ Start over
-</div>
+</a>
 
 <div hidden id="graph">
     <a id=svglink><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 100">
