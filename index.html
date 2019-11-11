@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <meta charset=UTF-8>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>H/2 Progressive test page</title>
+<title>H/2 Parallel Progressive Streaming demo page</title>
 <script>
 if (location.protocol == 'http:' && location.hostname != 'localhost') {
     location = `https://${location.host}`;
@@ -170,177 +170,7 @@ if (location.protocol == 'http:' && location.hostname != 'localhost') {
         checkhash()
     })
 </script>
-<style>
-body {
-    background: #fff;
-    color: #000;
-    margin: 0; padding: 0;
-    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Fira Sans","Droid Sans","Helvetica Neue",sans-serif;
-    font-size: 0.875em;
-    font-weight: 300;
-    line-height: 1.5;
-}
-body.testing {
-    background: #555;
-    color: #fff;
-}
-body.testing #intro {
-    display: none;
-}
-#image-list {
-    border: 2px solid black;
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-auto-rows: 1fr;
-}
-#image-list li {
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    display: block;
-}
-@media (min-aspect-ratio: 5/2) {
-    #image-list {
-        grid-template-columns: repeat(6, 1fr);
-    }
-}
-@media (max-aspect-ratio: 4/3) {
-    #image-list {
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
-@media (max-aspect-ratio: 1/1) {
-    #image-list {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-@media (max-aspect-ratio: 1/3) {
-    #image-list {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-#image-list img {
-    border: 2px solid black;
-    box-sizing: border-box;
-    object-fit: cover;
-    width: 100%;
-    height: auto;
-    display: block;
-}
-#graph svg {
-    width: 100%;
-    height: auto;
-    display: block;
-    margin: 0; padding: 0;
-    opacity: 0.95;
-}
-#graph span {
-    display: inline-block;
-    width: 0.75em;
-    height: 0.75em;
-    content: "";
-    vertical-align: middle;
-    box-shadow: 0 1px 1px rgba(0,0,0,0.1);
-    box-sizing: border-box;
-    background-clip: border-box;
-    margin: 0 0.1ex 0 0;
-}
-#graph div {
-    position: absolute;
-}
-#graph div.top {
-    top: 20px;
-    left: 20px;
-    color: white;
-    text-shadow: 0 1px 1px black;
-}
-#graph div.bot {
-    bottom: 20px;
-    right: 20px;
-    color: black;
-    text-shadow: 1px 1px 0 white, 0px -1px 2px white;
-    text-align: right;
-}
-#graph {
-    overflow: hidden;
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    right: 20px;
-    font-size: 0.8em;
-    border: 1px solid black;
-    max-width: 800px;
-}
-#back {
-    overflow: hidden;
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    color: #fff;
-    text-shadow: 0 1px 1px black;
-    background: rgba(0,0,0,0.3);
-    padding: 1em;
-    border: 1px solid black;
-    cursor: pointer;
-}
-@media (max-width: 480px) {
-    #graph {
-        font-size: 0.7em;
-        bottom: 10px;
-        left: 10px;
-        right: 10px;
-    }
-}
-*[hidden] {
-    display: none !important;
-}
-#intro {
-    max-width: 762px;
-    padding: 1em 2em;
-    margin: 0 auto;
-}
-#intro h1 {
-    margin: 0;
-}
-#intro h1 img {
-    border: 0;
-    width: 100%;
-    height: auto;
-    display: block;
-    color: #727bb3;
-}
-.orange, .gray {
-    display: table;
-    margin: 1em auto;
-    font-size: 1.25em;
-    border: none;
-    border-radius: 5px;
-    padding: 0.5em 1em;
-    cursor: pointer;
-    text-shadow: 0 1px 0 rgba(255,255,255,0.3);
-    text-decoration: none;
-}
-.orange {
-    background: #FAAD3F;
-    border: 1px solid #c87;
-    color: #000;
-    box-shadow: inset -2px -4px 7px rgba(180,50,0,0.15);
-}
-.gray {
-    background: #bbb;
-    border: 1px solid #888;
-    color: #000;
-    box-shadow: inset -3px -5px 10px rgba(0,0,0,0.1);
-}
-.orange:hover, .gray:hover {
-    box-shadow: none;
-    border-color: #000;
-}
-</style>
+<link rel=stylesheet href=/style.css>
 <body>
 <script>
 if (location.hash == '#enabled' || location.hash == '#disabled') {
@@ -352,14 +182,13 @@ if (location.hash == '#enabled' || location.hash == '#disabled') {
 <h1><img width="761" height="310" src="logo.png" alt="HTTP/2 Parallel Progressive Streaming"></h1>
 This is a demo page of Cloudflare's HTTP/2 prioritization feature applied to progressive JPEG images. It&nbsp;makes all images on the page appear to load quicker by&nbsp;prioritizing their progressive "previews" on&nbsp;the network level. <a href="https://blog.cloudflare.com/parallel-streaming-of-progressive-images/">See the blog post for&nbsp;details</a>.
 
-<noscript><p>JavaScript is required for this demo (but it's not required for the HTTP/2 prioritization).</p></noscript>
+<noscript><p><a href="/nojs.html">See no-js alternative</a>. JavaScript is required for this demo with realtime analysis and cache control, but it's not required for the HTTP/2 prioritization.</p></noscript>
 
 <p><a class="orange" href="#enabled">Start with prioritization</a></p>
 <p><a class="gray" href="#disabled">Start without prioritization</a></p>
 
 <p>The demo will show a graph of page's overall visual progress over time. Graph with a large amount of color (orange and green) shows good utilization of progressive rendering. A linear mostly black-and-white graph means sequential loading. The data is based on loading progress measured by a ServiceWorker running in the browser. Actual on-screen rendering may be different due to refresh throttling and quality of JPEG decoding implementation.</p>
 </div>
-
 
 <a hidden id="back" href="#">
     ‹ Start over
