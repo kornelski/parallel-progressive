@@ -19,14 +19,20 @@ addEventListener('fetch', event => {
         const headers = new Headers(res.headers);
         let pri;
         if (noPriority) {
-            pri = "0;30/0";
+            pri = "0:30/0";
         } else {
             pri = headers.get('cf-priority-change');
             if (!pri) {
                 pri = JiraCACHE6059Workaround[`${image}-${size}`];
             }
         }
-        headers.set('cf-speed-demo-priority', pri);
+        pri = pri.replace(/;/g,':').replace(/\s/g,''); // format fail :D
+        const m = pri.match(/^0:([^,]+)/);
+        if (m) {
+            headers.set('cf-priority', m[0]); // format fail again
+            headers.set('cf-speed-demo-priority', m[0]); // format fail again
+        }
+        headers.set('cf-speed-demo-priority-change', pri);
         headers.set('cf-priority-enabled', 1); // that shouldn't be needed…
         headers.set('cf-priority-change', pri);
         return new Response(res.body, {
