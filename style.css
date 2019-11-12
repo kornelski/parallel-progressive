@@ -167,3 +167,9 @@ body.testing #intro {
     box-shadow: none;
     border-color: #000;
 }
+svg.example {
+    float: left;
+    margin: 0 1em 0.5em 0;
+    border: 1px solid #ddd;
+}
+h3 {clear: left;}
