@@ -35,6 +35,7 @@ addEventListener('fetch', event => {
         headers.set('cf-speed-demo-priority-change', pri);
         headers.set('cf-priority-enabled', 1); // that shouldn't be needed…
         headers.set('cf-priority-change', pri);
+        headers.set('cache-control', 'no-store');
         return new Response(res.body, {
             status: res.status,
             headers,

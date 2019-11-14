@@ -60,7 +60,7 @@ if (location.protocol == 'http:' && location.hostname != 'localhost') {
             numbers.unshift(1);
             numbers.push(24);
             let imagesHTML = '';
-            const cachebust = Date.now() % 10000;
+            const cachebust = Math.floor(Math.random() * 10000);
             for(const n of numbers) {
                 const baseurl = `https://jpeg.speedcf.com/worker?image=cat/${n}.jpg&cachebust=${cachebust}${withPrioritization ? '' : '&nopri=1'}`;
                 imagesHTML += `<li><img src="${baseurl}&size=300" width="300" height="300" srcset="${baseurl}&size=300 300w, ${baseurl}&size=600 600w" alt="cat"></li>`;
