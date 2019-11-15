@@ -95,10 +95,11 @@ if (location.protocol == 'http:' && location.hostname != 'localhost') {
             // Throttled refresh of the graph
             if (!waiting) {
                 waiting = true;
-                setTimeout(() => {
+                const cb = window.requestIdleCallback ? window.requestIdleCallback : requestAnimationFrame;
+                cb(() => {
                     waiting = false;
                     refresh()
-                }, 1000);
+                });
             }
         });
         function frac(start, end, value) {
