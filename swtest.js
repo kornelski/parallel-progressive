@@ -1,6 +1,4 @@
 
 self.addEventListener('fetch', event => {
-    return event.respondWith(async function(){
-        return await fetch(event.request);
-    }());
+    return event.respondWith(fetch(event.request));
 });
