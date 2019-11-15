@@ -12,14 +12,12 @@ self.addEventListener('fetch', event => {
         }
         // Split the stream, so that the page can get it unmodified without having to wait for
         // the ServiceWorker processing the chunks.
-        const [body1, body2] = res.body.tee();
+        // const [body1, body2] = res.body.tee();
         // const reader = body2.getReader();
-        let readSoFar = 0;
-        let prevTime = Date.now();
 
 
 
-        return new Response(body1, {
+        return new Response(res.body, {
             status: res.status,
             headers: res.headers,
         });
