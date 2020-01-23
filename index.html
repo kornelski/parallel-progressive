@@ -43,9 +43,6 @@ if (location.protocol == 'http:' && location.hostname != 'localhost') {
 
         let requests = new Map();
         function start(withPrioritization) {
-            if (isProgressiveJPEGBorked()) {
-                alert("Sorry, Safari does not render JPEG images progressively, and therefore it won't benefit from faster progressive streaming :(");
-            }
             requests = new Map(); // reset
             document.body.className = 'testing';
             intro.setAttribute('hidden', 'hidden');
@@ -76,12 +73,6 @@ if (location.protocol == 'http:' && location.hostname != 'localhost') {
 
             imglist.innerHTML = imagesHTML;
             imglist.removeAttribute('hidden');
-        }
-        function isProgressiveJPEGBorked() {
-            // unfortunately, progressive rendering can't be feature-detected (it's not about format support, but on-screen appearance)
-            // and Safari's popularity and complete lack of partial rendering warrants a warning
-            const ua = navigator.userAgent;
-            return /AppleWebKit.*Safari\/6/.test(ua) && !/Chrome|Edg|Android/.test(ua);
         }
         let waiting;
         // SW will report each chunk of data received
