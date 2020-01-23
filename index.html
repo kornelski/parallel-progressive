@@ -9,7 +9,8 @@ if (location.protocol == 'http:' && location.hostname != 'localhost') {
 }
     Promise.all([
         new Promise(r => document.addEventListener('DOMContentLoaded', r)),
-        navigator.serviceWorker.register('/sw.js')
+        // Old Chrome's serviceWorker wrecks performance
+        !/Chrome\/7[0-8]/.test(navigator.userAgent) ? navigator.serviceWorker.register('/sw.js') : null
     ])
     .then(() => {
         function checkhash() {
